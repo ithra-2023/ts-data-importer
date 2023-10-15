@@ -1,12 +1,23 @@
 import 'dotenv/config';
+
 import {
 	FirebaseOptions,
 	initializeApp,
 	FirebaseApp,
 } from "firebase/app";
-import { Timestamp, getFirestore, initializeFirestore, addDoc, setDoc, doc, collection } from "firebase/firestore";
+
+import { 
+	getFirestore, 
+	initializeFirestore, 
+	addDoc, 
+	collection
+} from "firebase/firestore";
+
 import data from "./data/events.json"
-import { fb_data } from "./types";
+
+import { fb_data, fb_post } from "./types";
+
+import { convertToTimestamp, deleteCollection } from "./utils";
 
 const $config = process.env;
 
@@ -33,12 +44,25 @@ const firestore = getFirestore(firebaseApp);
 
 const collectionRef = collection(firestore, "events");
 
+
 const run = async () => {
+	await deleteCollection(firestore, collectionRef);
+	let target_object: fb_post;
     for (const item of data as fb_data[]) {
-        item.start_time = Timestamp.fromDate(new Date(data[0].start_time));
-        item.end_time = Timestamp.fromDate(new Date(data[0].end_time));
-        await addDoc(collectionRef, item);
+		target_object = {
+			entity: item.entity,
+			title: item.title,
+			category: item.category,
+			start_time: convertToTimestamp(item.start_time.toString()),
+			end_time: convertToTimestamp(item.end_time.toString()),
+			language: item.language,
+			city: item.city,
+			area: item.area,
+			ll: item.ll
+		};
+        await addDoc(collectionRef, target_object);
     }
+	process.exit();
 }
 
 run();
