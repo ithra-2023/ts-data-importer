@@ -17,7 +17,7 @@ import data from "./data/events.json"
 
 import { fb_data, fb_post } from "./types";
 
-import { convertToTimestamp, deleteCollection } from "./utils";
+import { convertToTimestamp, deleteCollection, convertToDate, convertToTimeOnly } from "./utils";
 
 const $config = process.env;
 
@@ -53,14 +53,17 @@ const run = async () => {
 			entity: item.entity,
 			title: item.title,
 			category: item.category,
-			start_time: convertToTimestamp(item.start_time.toString()),
-			end_time: convertToTimestamp(item.end_time.toString()),
+			start_date: convertToDate(item.start_date.toString()),
+			end_date: convertToDate(item.end_date.toString()),
+			start_time: convertToTimeOnly(item.start_time),
+			end_time: convertToTimeOnly(item.end_time),
 			language: item.language,
 			city: item.city,
 			area: item.area,
 			ll: item.ll
 		};
         await addDoc(collectionRef, target_object);
+		//break;
     }
 	process.exit();
 }
